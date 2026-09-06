@@ -1,0 +1,12 @@
+{
+  "name": "Avyaan's Little World",
+  "short_name": "Little World",
+  "description": "A private, playful learning world for curious little explorers.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fff9ee",
+  "theme_color": "#7563c7",
+  "icons": [
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}
