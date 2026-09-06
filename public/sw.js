@@ -1,4 +1,4 @@
-const CACHE_NAME = "little-world-v1";
+const CACHE_NAME = "little-world-v2";
 const CORE_FILES = ["/", "/manifest.webmanifest", "/favicon.svg"];
 
 self.addEventListener("install", (event) => {
@@ -13,9 +13,20 @@ self.addEventListener("activate", (event) => {
 
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET" || new URL(event.request.url).origin !== self.location.origin) return;
-  event.respondWith(caches.match(event.request).then((cached) => cached || fetch(event.request).then((response) => {
-    const copy = response.clone();
-    caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
-    return response;
-  }).catch(() => caches.match("/"))));
+
+  if (event.request.mode === "navigate") {
+    event.respondWith(fetch(event.request).then((response) => {
+      if (response.ok) caches.open(CACHE_NAME).then((cache) => cache.put(event.request, response.clone()));
+      return response;
+    }).catch(() => caches.match(event.request).then((cached) => cached || caches.match("/"))));
+    return;
+  }
+
+  event.respondWith(caches.match(event.request).then((cached) => {
+    const refreshed = fetch(event.request).then((response) => {
+      if (response.ok) caches.open(CACHE_NAME).then((cache) => cache.put(event.request, response.clone()));
+      return response;
+    });
+    return cached || refreshed;
+  }));
 });

@@ -85,14 +85,30 @@ test("speech prefers a local friendly female voice and avoids a male-only fallba
 });
 
 test("offline metadata and local-only asset policy are present", async () => {
-  const [manifest, licenses, layout] = await Promise.all([
+  const [manifest, licenses, layout, serviceWorker] = await Promise.all([
     readFile(new URL("../public/manifest.webmanifest", import.meta.url), "utf8"),
     readFile(new URL("../ASSET_LICENSES.md", import.meta.url), "utf8"),
     readFile(new URL("../app/layout.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../public/sw.js", import.meta.url), "utf8"),
   ]);
   assert.equal(JSON.parse(manifest).display, "standalone");
   assert.match(layout, /manifest\.webmanifest/);
   assert.match(licenses, /No runtime asset is loaded from a CDN or external URL/);
+  assert.match(serviceWorker, /event\.request\.mode === "navigate"/);
+  assert.match(serviceWorker, /fetch\(event\.request\)/);
+});
+
+test("production build emits a secure static Cloudflare Pages artifact", async () => {
+  const [html, headers] = await Promise.all([
+    readFile(new URL("../dist/client/index.html", import.meta.url), "utf8"),
+    readFile(new URL("../dist/client/_headers", import.meta.url), "utf8"),
+  ]);
+  assert.match(html, /Ready to play/);
+  assert.match(html, /Avyaan(?:&#x27;|')s Little World/);
+  assert.match(html, /https:\/\/avyaans-little-world\.pages\.dev\/og\.png/);
+  assert.match(headers, /Content-Security-Policy:/);
+  assert.match(headers, /Permissions-Policy: camera=\(\), microphone=\(\)/);
+  assert.match(headers, /X-Frame-Options: DENY/);
 });
 
 test("keeps the toddler usability safeguards wired in", async () => {

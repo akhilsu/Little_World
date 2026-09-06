@@ -374,6 +374,27 @@ fieldset.field { margin: 0; }
 @keyframes phrase-pop { 0% { transform: translate(-50%,-50%) scale(.5); opacity: 0; } 20%,75% { transform: translate(-50%,-50%) scale(1); opacity: 1; } 100% { transform: translate(-50%,-58%) scale(.95); opacity: 0; } }
 @keyframes sparkle-out { from { transform: rotate(var(--angle)) translateX(50px) scale(.3); opacity: 0; } 20% { opacity: 1; } to { transform: rotate(var(--angle)) translateX(310px) scale(1.2); opacity: 0; } }
 
+/* Keep every primary control visible on common laptop and classroom displays. */
+@media (min-width: 1060px) and (max-height: 950px) {
+  .activity-page { padding-top: 20px; padding-bottom: 20px; }
+  .activity-header { min-height: 82px; }
+  .activity-body { padding-top: 12px; }
+  .mode-tabs { margin-bottom: 14px; }
+  .food-feature { min-height: 210px; margin-bottom: 16px; padding: 20px 42px; }
+  .food-feature > span { font-size: 7rem; line-height: 1; }
+  .food-grid, .vehicle-grid { gap: 12px; }
+  .food-grid button, .vehicle-grid button { min-height: 128px; padding: 10px; gap: 4px; }
+  .food-grid button > span, .vehicle-grid button > span { font-size: 3.6rem; line-height: 1; }
+  .vehicle-track { height: 180px; }
+  .vehicle-track::before { top: 16px; font-size: 2.2rem; }
+  .moving-vehicle { bottom: 30px; font-size: 7rem; }
+  .vehicle-airplane { bottom: 74px; }
+  .vehicle-name { margin: 8px 0; }
+  .vehicle-name h2 { font-size: 2rem; }
+  .bubble-sky { height: calc(100svh - 280px); min-height: 450px; }
+  .body-playground { min-height: 560px; }
+}
+
 @media (max-width: 1050px) {
   .activity-grid { grid-template-columns: repeat(3,1fr); }
   .learning-grid { grid-template-columns: repeat(4,1fr); }

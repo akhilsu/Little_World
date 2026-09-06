@@ -27,6 +27,19 @@ npm run build
 npm run preview
 ```
 
+### Cloudflare Pages
+
+The production build is a static export designed for Cloudflare Pages. Use:
+
+- Build command: `npm run build:pages`
+- Build output directory: `dist/client`
+- Production branch: `main`
+- Intended production URL: `https://avyaans-little-world.pages.dev`
+
+The generated `_headers` file applies restrictive browser permissions and security headers. No production environment variables, database, or server runtime are required.
+
+After authenticating Wrangler with the intended Cloudflare account, `npm run deploy:pages` builds and deploys the production branch directly.
+
 Run all checks:
 
 ```bash
