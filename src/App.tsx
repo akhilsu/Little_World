@@ -15,6 +15,7 @@ const ActivitiesRouter = lazy(() => import("./activities/ActivitiesRouter"));
 
 export interface ActivityRuntime {
   settings: Settings;
+  activityCounts: DailyProgress["activities"];
   say: (text: string) => void;
   reward: (phrase?: string) => void;
   trackItem: (kind: "colors" | "letters" | "animals", id: string) => void;
@@ -103,7 +104,7 @@ export default function App() {
     );
   }
 
-  const runtime: ActivityRuntime = { settings, say, reward, trackItem, trackDrawing, onHome: () => { stopSpeaking(); setActive(null); } };
+  const runtime: ActivityRuntime = { settings, activityCounts: progress.activities, say, reward, trackItem, trackDrawing, onHome: () => { stopSpeaking(); setActive(null); } };
 
   return (
     <div className={`app-root theme-${settings.theme} motion-${settings.animation}`}>

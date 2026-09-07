@@ -91,9 +91,10 @@ test("speech prefers a local friendly female voice and avoids a male-only fallba
 });
 
 test("learning taps speak names only and correct answers use applause", async () => {
-  const [app, explore, games, growing, sounds] = await Promise.all([
+  const [app, explore, extensions, games, growing, sounds] = await Promise.all([
     readFile(new URL("../src/App.tsx", import.meta.url), "utf8"),
     readFile(new URL("../src/activities/ExploreActivities.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../src/activities/ActivityExtensions.tsx", import.meta.url), "utf8"),
     readFile(new URL("../src/activities/GameActivities.tsx", import.meta.url), "utf8"),
     readFile(new URL("../src/activities/GrowingActivities.tsx", import.meta.url), "utf8"),
     readFile(new URL("../src/utils/sound.ts", import.meta.url), "utf8"),
@@ -107,15 +108,45 @@ test("learning taps speak names only and correct answers use applause", async ()
   assert.match(sounds, /appreciationNotes = \[523\.25, 659\.25, 783\.99, 1046\.5\]/);
 
   assert.doesNotMatch(explore, /runtime\.say\([^\n]*(?:association|\.speech|vehicleSound)/);
+  assert.doesNotMatch(extensions, /runtime\.say\([^\n]*(?:association|\.speech|animalSound|vehicleSound)/);
   assert.doesNotMatch(games, /runtime\.say\([^\n]*(?:association|\.speech)/);
   assert.doesNotMatch(growing, /runtime\.say\([^\n]*(?:association|\.speech|animalSound|vehicleSound)/);
-  assert.doesNotMatch(`${explore}\n${games}\n${growing}`, /runtime\.say\("Try /);
-  assert.doesNotMatch(`${explore}\n${games}\n${growing}`, /popSound/);
+  assert.doesNotMatch(`${explore}\n${extensions}\n${games}\n${growing}`, /runtime\.say\("Try /);
+  assert.doesNotMatch(`${explore}\n${extensions}\n${games}\n${growing}`, /popSound/);
   assert.match(explore, /runtime\.say\(item\.name\)/);
   assert.match(explore, /runtime\.say\("How are you feeling today\?"\)/);
-  assert.match(games, /runtime\.reward\(next\.length === runtime\.settings\.memoryPairs/);
+  assert.match(games, /runtime\.reward\(next\.length === pairCount/);
   assert.match(growing, /runtime\.say\(item\.name\)/);
   assert.match(growing, /runtime\.reward\(/);
+});
+
+test("valuable extensions deepen familiar activities without replacing free play", async () => {
+  const [app, explore, extensions, games, styles] = await Promise.all([
+    readFile(new URL("../src/App.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../src/activities/ExploreActivities.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../src/activities/ActivityExtensions.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../src/activities/GameActivities.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../app/globals.css", import.meta.url), "utf8"),
+  ]);
+
+  for (const component of ["CategorySort", "ColorMixPlay", "ShapeBuilder", "LetterMatchPlay", "NumberComparePlay", "NumberFeedPlay", "FoodPlatePlay", "RhythmCopyPlay", "FeelingComforts"]) {
+    assert.match(extensions, new RegExp(`export function ${component}`));
+  }
+  for (const mode of ["sort", "mix", "build", "match", "compare", "feed", "plate", "places"]) assert.match(explore, new RegExp(`value: ["']${mode}["']`));
+  for (const mode of ["shadows", "families", "mirror", "path", "rhythm"]) assert.match(games, new RegExp(`value: ["']${mode}["']`));
+
+  assert.match(extensions, /draggable=/);
+  assert.match(extensions, /onDrop=/);
+  assert.match(extensions, /onClick=/);
+  assert.match(extensions, /placedRef\.current/);
+  assert.match(extensions, /playingRef\.current/);
+  assert.match(games, /useState<2 \| 3>\(2\)/);
+  assert.match(games, /reset\(true\)/);
+  assert.match(games, /busyRef\.current/);
+  assert.match(games, /Where (?:is|are)/);
+  assert.match(app, /activityCounts: progress\.activities/);
+  assert.match(games, /nextSurpriseIndex\(value, runtime\.activityCounts\)/);
+  assert.match(styles, /@media \(max-width: 540px\)[\s\S]*\.comfort-row/);
 });
 
 test("six growth activities are complete, forgiving, and touch friendly", async () => {

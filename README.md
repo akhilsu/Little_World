@@ -51,6 +51,25 @@ The site uses browser Speech Synthesis for spoken feedback and the Web Audio API
 
 The six activities under **More ways to grow** use the same local voice and applause reward as the original playground. Sorting and Little Puzzles support drag-and-drop, but every action also has a simpler tap-a-piece, tap-a-space path for touch screens and small hands.
 
+## Extensions inside familiar activities
+
+The original explore and free-play experiences remain available, with optional deeper play added alongside them:
+
+- Colors can sort familiar objects and gently mix two colors.
+- Shapes can build a house, rocket, or face from three large pieces.
+- ABC focuses on three letters at a time and matches each letter to a familiar object.
+- Numbers adds more-or-less comparison and a small count-and-feed game.
+- Animals, food, and vehicles add tap-first sorting into familiar homes or groups.
+- Matching adds object shadows and grown-up-to-baby animal pairs.
+- Memory always begins with two pairs and only offers a third pair when the Parent Area allows it.
+- Drawing adds large stickers, symmetry drawing, and simple guided paths while keeping Free Draw.
+- Music adds slow copy-the-rhythm rounds while keeping all free-play instruments.
+- Feelings offers gentle cuddle, rest, breathe, and smile choices.
+- My Body includes calm “where is it?” prompts.
+- Surprise Me favors activities that have been explored less often today.
+
+Wrong taps stay quiet and simply give a short visual wiggle. Correct learning answers use the shared applause-and-appreciation reward.
+
 ## Parent Area
 
 Press and hold the small gear for about three seconds. The Parent Area can:
@@ -120,7 +139,7 @@ The production version registers `public/sw.js`, which caches same-origin files 
 
 - `app/` — page shell, metadata, and responsive visual system
 - `src/App.tsx` — startup, navigation, settings, progress, rewards, and session reminders
-- `src/activities/` — all 23 activity implementations
+- `src/activities/` — all 23 activity implementations and the reusable extensions inside familiar activities
 - `src/components/` — reusable activity shell, celebration, error recovery, and Parent Area
 - `src/data/learningContent.ts` — English learning data and UI copy architecture
 - `src/utils/` — local speech, generated sound, storage, and randomization
