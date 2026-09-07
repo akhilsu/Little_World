@@ -94,6 +94,7 @@ test("learning taps speak names only and correct answers use applause", async ()
 
   assert.match(app, /clapSound\(settings\.volume\)/);
   assert.doesNotMatch(app, /happySound|say\(nextPhrase\)/);
+  assert.match(app, /say\(`Hello \$\{settings\.childName/);
   assert.match(sounds, /export function clapSound/);
   assert.match(sounds, /burstOffsets = \[0, \.08, \.16, \.27, \.39, \.52\]/);
 
@@ -102,6 +103,7 @@ test("learning taps speak names only and correct answers use applause", async ()
   assert.doesNotMatch(`${explore}\n${games}`, /runtime\.say\("Try /);
   assert.doesNotMatch(`${explore}\n${games}`, /popSound/);
   assert.match(explore, /runtime\.say\(item\.name\)/);
+  assert.match(explore, /runtime\.say\("How are you feeling today\?"\)/);
   assert.match(games, /runtime\.reward\(next\.length === runtime\.settings\.memoryPairs/);
 });
 

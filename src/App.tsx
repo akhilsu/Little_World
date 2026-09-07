@@ -93,7 +93,7 @@ export default function App() {
           <p className="hello">Hello, {settings.childName || "Little Explorer"}! 👋</p>
           <h1 id="welcome-title">Ready to play?</h1>
           <p className="welcome-subtitle">A little world of happy discoveries awaits.</p>
-          <button className="play-button" onClick={() => { unlockAudio(); setStarted(true); }}><span aria-hidden="true">▶</span> Let&apos;s Play</button>
+          <button className="play-button" onClick={() => { unlockAudio(); setStarted(true); say(`Hello ${settings.childName || "little explorer"}! Ready to play?`); }}><span aria-hidden="true">▶</span> Let&apos;s Play</button>
           <div className="welcome-parent"><ParentGate onOpen={() => setParentOpen(true)} /></div>
         </section>
         {parentOpen && <ParentArea settings={settings} progress={progress} onChange={setSettings} onClose={() => setParentOpen(false)} onReset={() => { resetStoredProgress(); setProgress(emptyProgress()); }} onFullscreen={() => void document.documentElement.requestFullscreen?.()} />}

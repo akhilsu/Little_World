@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { ActivityRuntime } from "../App";
 import { ActivityShell, BigPrompt, ListenButton, ModeTabs } from "../components/Shared";
 import { alphabet, animals, colors, feelings, foods, shapes, vehicles } from "../data/learningContent";
@@ -153,6 +153,7 @@ function vehiclePhrase(id: string) { return (["airplane"].includes(id) ? "Up, up
 
 export function FeelingsActivity({ runtime }: Props) {
   const [selected, setSelected] = useState(feelings[0]);
+  useEffect(() => { runtime.say("How are you feeling today?"); }, []); // eslint-disable-line react-hooks/exhaustive-deps
   const choose = (item: LearningItem) => { setSelected(item); runtime.say(item.name); };
   return (
     <ActivityShell title="Friendly Feelings" subtitle="Every feeling is okay" icon="😊" onHome={runtime.onHome} actions={<ListenButton onClick={() => runtime.say(selected.name)} />}>
