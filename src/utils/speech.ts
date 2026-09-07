@@ -18,10 +18,21 @@ export const PREFERRED_FEMALE_VOICE_NAMES = [
 
 const FEMALE_VOICE_HINT = /\b(samantha|flo|sandy|shelley|ava|allison|zoe|victoria|karen|moira|tessa|tara|aria|zira|female)\b/i;
 const MALE_VOICE_HINT = /\b(albert|alex|aman|arthur|daniel|david|eddy|fred|george|grandpa|james|john|junior|liam|oliver|ralph|reed|rishi|ryan|thomas|tom)\b/i;
+const SPOKEN_LETTER_NAMES: Record<string, string> = {
+  A: "ay", B: "bee", C: "see", D: "dee", E: "ee", F: "eff", G: "gee",
+  H: "aitch", I: "eye", J: "jay", K: "kay", L: "el", M: "em", N: "en",
+  O: "oh", P: "pee", Q: "cue", R: "ar", S: "ess", T: "tee", U: "you",
+  V: "vee", W: "double you", X: "ex", Y: "why", Z: "zee",
+};
 let speechRequest = 0;
 
 function normalized(value: string): string {
   return value.trim().toLocaleLowerCase();
+}
+
+export function textForSpeech(text: string): string {
+  const trimmed = text.trim();
+  return SPOKEN_LETTER_NAMES[trimmed] ?? text;
 }
 
 export function selectPreferredFemaleVoice(voices: readonly SpeechSynthesisVoice[]): SpeechSynthesisVoice | null {
@@ -46,7 +57,7 @@ function playSpeech(text: string, options: SpeechOptions, request: number, voice
   const voice = selectPreferredFemaleVoice(voices);
   if (!voice) return;
 
-  const utterance = new SpeechSynthesisUtterance(text);
+  const utterance = new SpeechSynthesisUtterance(textForSpeech(text));
   utterance.voice = voice;
   utterance.lang = voice.lang;
   utterance.volume = Math.max(0, Math.min(1, options.volume));

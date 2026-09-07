@@ -52,6 +52,9 @@ test("speech prefers a local friendly female voice and avoids a male-only fallba
   assert.equal(speech.selectPreferredFemaleVoice([voice("Google US English Female", "en-US", false), voice("Tessa", "en-ZA")]).name, "Tessa");
   assert.equal(speech.selectPreferredFemaleVoice([voice("Daniel", "en-GB")]), null);
   assert.equal(speech.selectPreferredFemaleVoice([voice("Google US English Female", "en-US", false)]), null);
+  assert.equal(speech.textForSpeech("A"), "ay");
+  assert.equal(speech.textForSpeech("B"), "bee");
+  assert.equal(speech.textForSpeech("Welcome, Avyaan!"), "Welcome, Avyaan!");
 
   const spoken = [];
   let cancelled = 0;
@@ -75,9 +78,12 @@ test("speech prefers a local friendly female voice and avoids a male-only fallba
     assert.equal(spoken[0].volume, 1);
     assert.equal(spoken[0].rate, 0.86);
     assert.equal(spoken[0].pitch, 1.14);
+    speech.speak("A", { enabled: true, volume: 1 });
+    assert.equal(spoken.length, 2);
+    assert.equal(spoken[1].text, "ay");
     speech.speak("Muted", { enabled: false, volume: 1 });
-    assert.equal(spoken.length, 1);
-    assert.equal(cancelled, 2);
+    assert.equal(spoken.length, 2);
+    assert.equal(cancelled, 3);
   } finally {
     delete globalThis.window;
     delete globalThis.SpeechSynthesisUtterance;
