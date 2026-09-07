@@ -1,6 +1,6 @@
 # Avyaan's Little World
 
-A private, local-first learning playground made for a curious 2–3 year old. It includes 17 genuinely interactive activities for colors, shapes, ABC, numbers, animals, food, vehicles, matching, memory, drawing, music, keyboard practice, bubbles, visual search, feelings, body parts, and tiny surprise games.
+A private, local-first learning playground made for a curious 2–3 year old. It includes 23 genuinely interactive activities for colors, shapes, ABC, numbers, animals, food, vehicles, matching, memory, drawing, music, keyboard practice, bubbles, visual search, feelings, body parts, tiny surprise games, everyday vocabulary, sorting, counting and feeding, size comparison, patterns, and little puzzles.
 
 Nothing is sent anywhere. There are no accounts, ads, analytics, external links, cameras, microphones, or network-loaded learning assets. Progress and preferences stay in this browser's local storage.
 
@@ -49,6 +49,8 @@ npm run lint
 
 The site uses browser Speech Synthesis for spoken feedback and the Web Audio API for generated music and effects. It prefers the warm local “Samantha” voice on macOS, then tries a short list of friendly local female English voices on other systems. Voice availability varies by browser and operating system; speech stays silent rather than falling back to a known male or online voice.
 
+The six activities under **More ways to grow** use the same local voice and applause reward as the original playground. Sorting and Little Puzzles support drag-and-drop, but every action also has a simpler tap-a-piece, tap-a-space path for touch screens and small hands.
+
 ## Parent Area
 
 Press and hold the small gear for about three seconds. The Parent Area can:
@@ -76,10 +78,10 @@ The easiest method is Parent Area → **Child's name**. To change the code defau
 Add one row to `animals` in `src/data/learningContent.ts` using:
 
 ```ts
-["goat", "Goat", "🐐", "Farm", "Maa"]
+["goat", "Goat", "🐐", "Farm"]
 ```
 
-The animal explorer and its sound-finding game both use that shared data automatically.
+The animal explorer and its name-finding game both use that shared data automatically.
 
 ### Add a color
 
@@ -118,7 +120,7 @@ The production version registers `public/sw.js`, which caches same-origin files 
 
 - `app/` — page shell, metadata, and responsive visual system
 - `src/App.tsx` — startup, navigation, settings, progress, rewards, and session reminders
-- `src/activities/` — all 17 activity implementations
+- `src/activities/` — all 23 activity implementations
 - `src/components/` — reusable activity shell, celebration, error recovery, and Parent Area
 - `src/data/learningContent.ts` — English learning data and UI copy architecture
 - `src/utils/` — local speech, generated sound, storage, and randomization

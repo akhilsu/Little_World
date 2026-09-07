@@ -2,7 +2,7 @@
 
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { APP_NAME, DEFAULT_SETTINGS } from "./config";
-import { activities, encouragingPhrases } from "./data/learningContent";
+import { activities, encouragingPhrases, growingActivityIds } from "./data/learningContent";
 import { Celebration } from "./components/Shared";
 import { ParentArea, ParentGate } from "./components/ParentArea";
 import type { ActivityId, DailyProgress, Settings } from "./types";
@@ -82,6 +82,8 @@ export default function App() {
   };
 
   const visibleActivities = useMemo(() => activities.filter((activity) => !settings.hiddenActivities.includes(activity.id)), [settings.hiddenActivities]);
+  const originalActivities = useMemo(() => visibleActivities.filter((activity) => !growingActivityIds.includes(activity.id)), [visibleActivities]);
+  const growingActivities = useMemo(() => visibleActivities.filter((activity) => growingActivityIds.includes(activity.id)), [visibleActivities]);
   const favoriteActivities = useMemo(() => visibleActivities.filter((activity) => settings.favorites.includes(activity.id)), [visibleActivities, settings.favorites]);
 
   if (!started) {
@@ -123,7 +125,8 @@ export default function App() {
           </section>
 
           {favoriteActivities.length > 0 && <section className="activity-section favorites-section" aria-labelledby="favorites-title"><div className="section-title"><h2 id="favorites-title">{settings.childName}&apos;s favorites</h2><span>♥</span></div><div className="favorites-row">{favoriteActivities.map((activity) => <ActivityCard key={activity.id} activity={activity} onClick={() => openActivity(activity.id)} compact />)}</div></section>}
-          <section className="activity-section" aria-labelledby="activity-title"><h2 id="activity-title">Pick something fun</h2><div className="activity-grid">{visibleActivities.map((activity) => <ActivityCard key={activity.id} activity={activity} onClick={() => openActivity(activity.id)} />)}</div></section>
+          <section className="activity-section" aria-labelledby="activity-title"><h2 id="activity-title">Pick something fun</h2><div className="activity-grid">{originalActivities.map((activity) => <ActivityCard key={activity.id} activity={activity} onClick={() => openActivity(activity.id)} />)}</div></section>
+          {growingActivities.length > 0 && <section className="activity-section growing-section" aria-labelledby="growing-title"><div className="section-title"><h2 id="growing-title">More ways to grow</h2><span aria-hidden="true">🌱</span></div><div className="activity-grid">{growingActivities.map((activity) => <ActivityCard key={activity.id} activity={activity} onClick={() => openActivity(activity.id)} />)}</div></section>}
           <footer className="home-footer"><span>Made with love for little learners</span><button onClick={() => void document.documentElement.requestFullscreen?.()}>⛶ Play Fullscreen</button></footer>
         </main>
       )}

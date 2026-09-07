@@ -23,7 +23,7 @@ test("renders the private learning playground shell", async () => {
 
 test("routes every promised activity to a working component", async () => {
   const router = await readFile(new URL("../src/activities/ActivitiesRouter.tsx", import.meta.url), "utf8");
-  const ids = ["colors","shapes","alphabet","numbers","animals","foods","vehicles","matching","memory","draw","music","keyboard","bubbles","find","feelings","body","surprise"];
+  const ids = ["colors","shapes","alphabet","numbers","animals","foods","vehicles","matching","memory","draw","music","keyboard","bubbles","find","feelings","body","surprise","everyday","sorting","count-feed","big-small","patterns","puzzles"];
   for (const id of ids) assert.match(router, new RegExp(`case ["']${id}["']`));
   assert.doesNotMatch(router, /coming soon|placeholder/i);
 });
@@ -91,10 +91,11 @@ test("speech prefers a local friendly female voice and avoids a male-only fallba
 });
 
 test("learning taps speak names only and correct answers use applause", async () => {
-  const [app, explore, games, sounds] = await Promise.all([
+  const [app, explore, games, growing, sounds] = await Promise.all([
     readFile(new URL("../src/App.tsx", import.meta.url), "utf8"),
     readFile(new URL("../src/activities/ExploreActivities.tsx", import.meta.url), "utf8"),
     readFile(new URL("../src/activities/GameActivities.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../src/activities/GrowingActivities.tsx", import.meta.url), "utf8"),
     readFile(new URL("../src/utils/sound.ts", import.meta.url), "utf8"),
   ]);
 
@@ -107,11 +108,32 @@ test("learning taps speak names only and correct answers use applause", async ()
 
   assert.doesNotMatch(explore, /runtime\.say\([^\n]*(?:association|\.speech|vehicleSound)/);
   assert.doesNotMatch(games, /runtime\.say\([^\n]*(?:association|\.speech)/);
-  assert.doesNotMatch(`${explore}\n${games}`, /runtime\.say\("Try /);
-  assert.doesNotMatch(`${explore}\n${games}`, /popSound/);
+  assert.doesNotMatch(growing, /runtime\.say\([^\n]*(?:association|\.speech|animalSound|vehicleSound)/);
+  assert.doesNotMatch(`${explore}\n${games}\n${growing}`, /runtime\.say\("Try /);
+  assert.doesNotMatch(`${explore}\n${games}\n${growing}`, /popSound/);
   assert.match(explore, /runtime\.say\(item\.name\)/);
   assert.match(explore, /runtime\.say\("How are you feeling today\?"\)/);
   assert.match(games, /runtime\.reward\(next\.length === runtime\.settings\.memoryPairs/);
+  assert.match(growing, /runtime\.say\(item\.name\)/);
+  assert.match(growing, /runtime\.reward\(/);
+});
+
+test("six growth activities are complete, forgiving, and touch friendly", async () => {
+  const [app, data, growing, styles] = await Promise.all([
+    readFile(new URL("../src/App.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../src/data/learningContent.ts", import.meta.url), "utf8"),
+    readFile(new URL("../src/activities/GrowingActivities.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../app/globals.css", import.meta.url), "utf8"),
+  ]);
+  for (const name of ["EverydayActivity", "SortingActivity", "CountFeedActivity", "BigSmallActivity", "PatternTrainActivity", "PuzzlesActivity"]) assert.match(growing, new RegExp(`export function ${name}`));
+  for (const id of ["everyday", "sorting", "count-feed", "big-small", "patterns", "puzzles"]) assert.match(data, new RegExp(`id: ["']${id}["']`));
+  assert.match(app, /More ways to grow/);
+  assert.match(growing, /draggable=/);
+  assert.match(growing, /onDrop=/);
+  assert.match(growing, /onClick=/);
+  assert.match(growing, /try-wiggle/);
+  assert.doesNotMatch(growing, /\b(?:wrong|failed|score|timer)\b/i);
+  assert.match(styles, /@media \(max-width: 540px\)[\s\S]*\.puzzle-board/);
 });
 
 test("offline metadata and local-only asset policy are present", async () => {

@@ -1,4 +1,4 @@
-import type { ActivityDefinition, LearningItem } from "../types";
+import type { ActivityDefinition, ActivityId, LearningItem } from "../types";
 
 export const uiText = {
   en: {
@@ -31,7 +31,15 @@ export const activities: ActivityDefinition[] = [
   { id: "feelings", name: "Friendly Feelings", shortName: "Feelings", icon: "😊", color: "#f59a79", description: "Faces and feelings" },
   { id: "body", name: "My Body", shortName: "My Body", icon: "🙋", color: "#7cc3a4", description: "Eyes, ears, nose, and toes" },
   { id: "surprise", name: "Surprise Me!", shortName: "Surprise Me", icon: "🎁", color: "#8b7bd3", description: "A tiny mystery game" },
+  { id: "everyday", name: "Everyday Things", shortName: "Everyday Things", icon: "🏡", color: "#dc8e72", description: "Name things all around us" },
+  { id: "sorting", name: "Sort & Group", shortName: "Sort & Group", icon: "🧺", color: "#70b69a", description: "Put friends where they belong" },
+  { id: "count-feed", name: "Count & Feed", shortName: "Count & Feed", icon: "🥕", color: "#e99e49", description: "Count tasty little bites" },
+  { id: "big-small", name: "Big & Small", shortName: "Big & Small", icon: "🐘", color: "#739ed8", description: "Spot the big and small one" },
+  { id: "patterns", name: "Pattern Train", shortName: "Pattern Train", icon: "🚂", color: "#a582cf", description: "What comes next?" },
+  { id: "puzzles", name: "Little Puzzles", shortName: "Little Puzzles", icon: "🧩", color: "#e47f9d", description: "Finish a tiny picture" },
 ];
+
+export const growingActivityIds: ActivityId[] = ["everyday", "sorting", "count-feed", "big-small", "patterns", "puzzles"];
 
 export const colors: LearningItem[] = [
   { id: "red", name: "Red", icon: "🍎", color: "#ef514c", association: "Apple" },

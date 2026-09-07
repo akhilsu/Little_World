@@ -2,7 +2,8 @@ export type ActivityId =
   | "colors" | "shapes" | "alphabet" | "numbers" | "animals"
   | "foods" | "vehicles" | "matching" | "memory" | "draw"
   | "music" | "keyboard" | "bubbles" | "find" | "feelings"
-  | "body" | "surprise";
+  | "body" | "surprise" | "everyday" | "sorting" | "count-feed"
+  | "big-small" | "patterns" | "puzzles";
 
 export type AnimationLevel = "full" | "gentle" | "off";
 export type ThemeName = "day" | "calm";
