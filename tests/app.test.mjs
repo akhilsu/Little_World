@@ -84,6 +84,27 @@ test("speech prefers a local friendly female voice and avoids a male-only fallba
   }
 });
 
+test("learning taps speak names only and correct answers use applause", async () => {
+  const [app, explore, games, sounds] = await Promise.all([
+    readFile(new URL("../src/App.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../src/activities/ExploreActivities.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../src/activities/GameActivities.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../src/utils/sound.ts", import.meta.url), "utf8"),
+  ]);
+
+  assert.match(app, /clapSound\(settings\.volume\)/);
+  assert.doesNotMatch(app, /happySound|say\(nextPhrase\)/);
+  assert.match(sounds, /export function clapSound/);
+  assert.match(sounds, /burstOffsets = \[0, \.08, \.16, \.27, \.39, \.52\]/);
+
+  assert.doesNotMatch(explore, /runtime\.say\([^\n]*(?:association|\.speech|vehicleSound)/);
+  assert.doesNotMatch(games, /runtime\.say\([^\n]*(?:association|\.speech)/);
+  assert.doesNotMatch(`${explore}\n${games}`, /runtime\.say\("Try /);
+  assert.doesNotMatch(`${explore}\n${games}`, /popSound/);
+  assert.match(explore, /runtime\.say\(item\.name\)/);
+  assert.match(games, /runtime\.reward\(next\.length === runtime\.settings\.memoryPairs/);
+});
+
 test("offline metadata and local-only asset policy are present", async () => {
   const [manifest, licenses, layout, serviceWorker] = await Promise.all([
     readFile(new URL("../public/manifest.webmanifest", import.meta.url), "utf8"),

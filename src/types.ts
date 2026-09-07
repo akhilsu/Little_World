@@ -33,7 +33,6 @@ export interface LearningItem {
   id: string;
   name: string;
   icon: string;
-  speech?: string;
   color?: string;
   group?: string;
   association?: string;

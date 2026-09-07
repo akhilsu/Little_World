@@ -27,24 +27,34 @@ export function tone(frequency: number, volume: number, duration = 0.35, type: O
   oscillator.stop(now + duration + 0.03);
 }
 
-export function happySound(volume: number): void {
-  tone(523.25, volume, 0.22);
-  window.setTimeout(() => tone(659.25, volume, 0.25), 110);
-  window.setTimeout(() => tone(783.99, volume, 0.32), 220);
-}
-
-export function popSound(volume: number): void {
+export function clapSound(volume: number): void {
   const ctx = context();
   if (!ctx || volume <= 0) return;
-  const oscillator = ctx.createOscillator();
-  const gain = ctx.createGain();
-  const now = ctx.currentTime;
-  oscillator.type = "sine";
-  oscillator.frequency.setValueAtTime(420, now);
-  oscillator.frequency.exponentialRampToValueAtTime(120, now + .12);
-  gain.gain.setValueAtTime(volume * .12, now);
-  gain.gain.exponentialRampToValueAtTime(.0001, now + .14);
-  oscillator.connect(gain).connect(ctx.destination);
-  oscillator.start();
-  oscillator.stop(now + .15);
+  const start = ctx.currentTime;
+  const burstOffsets = [0, .08, .16, .27, .39, .52];
+
+  burstOffsets.forEach((offset, index) => {
+    const duration = .07 + (index % 2) * .015;
+    const buffer = ctx.createBuffer(1, Math.ceil(ctx.sampleRate * duration), ctx.sampleRate);
+    const samples = buffer.getChannelData(0);
+    for (let sampleIndex = 0; sampleIndex < samples.length; sampleIndex += 1) {
+      const envelope = Math.pow(1 - sampleIndex / samples.length, 2.4);
+      samples[sampleIndex] = (Math.random() * 2 - 1) * envelope;
+    }
+
+    const source = ctx.createBufferSource();
+    const filter = ctx.createBiquadFilter();
+    const gain = ctx.createGain();
+    const when = start + offset;
+    source.buffer = buffer;
+    filter.type = "bandpass";
+    filter.frequency.value = 1450 + index * 90;
+    filter.Q.value = .7;
+    gain.gain.setValueAtTime(.0001, when);
+    gain.gain.exponentialRampToValueAtTime(Math.max(.0001, volume * .22), when + .006);
+    gain.gain.exponentialRampToValueAtTime(.0001, when + duration);
+    source.connect(filter).connect(gain).connect(ctx.destination);
+    source.start(when);
+    source.stop(when + duration + .01);
+  });
 }

@@ -1,12 +1,11 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import type { ActivityRuntime } from "../App";
 import { ActivityShell, BigPrompt, ListenButton, ModeTabs } from "../components/Shared";
 import { alphabet, animals, colors, feelings, foods, shapes, vehicles } from "../data/learningContent";
 import type { LearningItem } from "../types";
 import { optionsAround, sample } from "../utils/random";
-import { popSound } from "../utils/sound";
 
 type Props = { runtime: ActivityRuntime };
 
@@ -18,15 +17,14 @@ export function ColorsActivity({ runtime }: Props) {
 
   const choose = (item: LearningItem) => {
     setSelected(item);
-    if (runtime.settings.soundOn) popSound(runtime.settings.volume);
     if (mode === "explore") {
-      runtime.say(`${item.name}. ${item.association}.`);
+      runtime.say(item.name);
       runtime.trackItem("colors", item.id);
     } else if (item.id === target.id) {
       runtime.trackItem("colors", item.id);
       runtime.reward(`Great! ${item.name}!`);
       window.setTimeout(() => setTarget(sample(colors.filter((color) => color.id !== target.id))), 700);
-    } else runtime.say("Try another one!");
+    }
   };
 
   return (
@@ -45,9 +43,8 @@ export function ShapesActivity({ runtime }: Props) {
   const options = useMemo(() => optionsAround(target, shapes, 4), [target]);
   const choose = (item: LearningItem) => {
     setSelected(item);
-    if (mode === "explore") runtime.say(`${item.name}. Like a ${item.association}.`);
+    if (mode === "explore") runtime.say(item.name);
     else if (item.id === target.id) { runtime.reward(`Yes! ${item.name}!`); window.setTimeout(() => setTarget(sample(shapes.filter((shape) => shape.id !== target.id))), 700); }
-    else runtime.say("Try another shape!");
   };
   return (
     <ActivityShell title="Shape Garden" subtitle="Round, pointy, tall, and wide" icon="🔷" onHome={runtime.onHome} actions={<ListenButton onClick={() => runtime.say(mode === "find" ? `Can you find the ${target.name}?` : selected.name)} />}>
@@ -63,7 +60,7 @@ export function AlphabetActivity({ runtime }: Props) {
   const groups = [alphabet.slice(0, 6), alphabet.slice(6, 12), alphabet.slice(12, 18), alphabet.slice(18, 24), alphabet.slice(24)];
   const [group, setGroup] = useState(0);
   const [selected, setSelected] = useState(alphabet[0]);
-  const choose = (item: LearningItem) => { setSelected(item); runtime.say(`${item.name}. ${item.association}.`); runtime.trackItem("letters", item.id); };
+  const choose = (item: LearningItem) => { setSelected(item); runtime.say(item.name); runtime.trackItem("letters", item.id); };
   return (
     <ActivityShell title="ABC Playground" subtitle="Big letters and little words" icon="Aa" onHome={runtime.onHome} actions={<ListenButton onClick={() => choose(selected)} />}>
       <div className="alphabet-stage"><div className="giant-letter"><span>{selected.name}</span><small>{selected.name.toLowerCase()}</small></div><div className="alphabet-object"><span aria-hidden="true">{selected.icon}</span><h2>{selected.association}</h2><p>{selected.name} is for {selected.association}</p></div></div>
@@ -84,7 +81,6 @@ export function NumbersActivity({ runtime }: Props) {
     setSelected(number);
     if (!countMode) runtime.say(numberName(number));
     else if (number === target) { runtime.reward(`${numberName(number)}!`); setTarget(sample([1, 2, 3, 4, 5])); }
-    else runtime.say("Try another number!");
   };
   return (
     <ActivityShell title="Happy Numbers" subtitle="Tap and count together" icon="123" onHome={runtime.onHome} actions={<ListenButton onClick={() => runtime.say(countMode ? `How many apples?` : numberName(selected))} />}>
@@ -101,23 +97,21 @@ function numberName(number: number): string {
 
 export function AnimalsActivity({ runtime }: Props) {
   const groups = ["Farm", "Wild", "Birds", "Sea"];
-  const soundAnimals = animals.filter((item) => item.speech && !["Hello", "Hum", "Call"].includes(item.speech));
   const [group, setGroup] = useState("Farm");
   const [selected, setSelected] = useState(animals[0]);
   const [game, setGame] = useState(false);
-  const [target, setTarget] = useState(() => sample(soundAnimals));
+  const [target, setTarget] = useState(() => sample(animals));
   const gameOptions = useMemo(() => optionsAround(target, animals, 3), [target]);
   const choose = (item: LearningItem) => {
     setSelected(item);
-    if (!game) { runtime.say(`${item.name}. ${item.speech}!`); runtime.trackItem("animals", item.id); }
-    else if (item.id === target.id) { runtime.trackItem("animals", item.id); runtime.reward(`${item.name}! ${item.speech}!`); window.setTimeout(() => setTarget(sample(soundAnimals.filter((animal) => animal.id !== target.id))), 800); }
-    else runtime.say("Listen and try another animal!");
+    if (!game) { runtime.say(item.name); runtime.trackItem("animals", item.id); }
+    else if (item.id === target.id) { runtime.trackItem("animals", item.id); runtime.reward(`${item.name}!`); window.setTimeout(() => setTarget(sample(animals.filter((animal) => animal.id !== target.id))), 800); }
   };
   return (
-    <ActivityShell title="Animal Friends" subtitle="Tap an animal to hear its voice" icon="🦁" onHome={runtime.onHome} actions={<ListenButton onClick={() => runtime.say(game ? `Who says ${target.speech}?` : `${selected.name}. ${selected.speech}!`)} />}>
-      <div className="animal-controls"><div className="category-tabs">{groups.map((item) => <button key={item} className={group === item && !game ? "active" : ""} onClick={() => { setGame(false); setGroup(item); }}>{groupIcon(item)} {item}</button>)}</div><button className={`sound-game-button ${game ? "active" : ""}`} onClick={() => { setGame(true); runtime.say(`Who says ${target.speech}?`); }}>🔊 Who says?</button></div>
-      {game ? <BigPrompt>Who says “{target.speech}”?</BigPrompt> : <div className="animal-feature"><span className="animal-big" aria-hidden="true">{selected.icon}</span><div><span>HELLO, I&apos;M A</span><h2>{selected.name}</h2><button onClick={() => runtime.say(`${selected.speech}!`)}>🔊 {selected.speech}!</button></div></div>}
-      <div className={`learning-grid animal-grid ${game ? "three-options" : ""}`}>{(game ? gameOptions : animals.filter((item) => item.group === group)).map((item) => <button key={item.id} onClick={() => choose(item)} className={selected.id === item.id && !game ? "chosen" : ""}><span aria-hidden="true">{item.icon}</span><b>{item.name}</b>{!game && <small>Tap to listen</small>}</button>)}</div>
+    <ActivityShell title="Animal Friends" subtitle="Tap an animal to hear its name" icon="🦁" onHome={runtime.onHome} actions={<ListenButton onClick={() => runtime.say(game ? `Can you find the ${target.name}?` : selected.name)} />}>
+      <div className="animal-controls"><div className="category-tabs">{groups.map((item) => <button key={item} className={group === item && !game ? "active" : ""} onClick={() => { setGame(false); setGroup(item); }}>{groupIcon(item)} {item}</button>)}</div><button className={`sound-game-button ${game ? "active" : ""}`} onClick={() => { setGame(true); runtime.say(`Can you find the ${target.name}?`); }}>🔎 Find animal</button></div>
+      {game ? <BigPrompt>Can you find the <strong>{target.name}</strong>?</BigPrompt> : <div className="animal-feature"><span className="animal-big" aria-hidden="true">{selected.icon}</span><div><span>HELLO, I&apos;M A</span><h2>{selected.name}</h2><button onClick={() => runtime.say(selected.name)}>🔊 {selected.name}</button></div></div>}
+      <div className={`learning-grid animal-grid ${game ? "three-options" : ""}`}>{(game ? gameOptions : animals.filter((item) => item.group === group)).map((item) => <button key={item.id} onClick={() => choose(item)} className={selected.id === item.id && !game ? "chosen" : ""}><span aria-hidden="true">{item.icon}</span><b>{item.name}</b>{!game && <small>Tap to hear name</small>}</button>)}</div>
     </ActivityShell>
   );
 }
@@ -145,7 +139,7 @@ function foodFact(id: string): string {
 export function VehiclesActivity({ runtime }: Props) {
   const [selected, setSelected] = useState(vehicles[0]);
   const [moving, setMoving] = useState(0);
-  const choose = (item: LearningItem) => { setSelected(item); setMoving((value) => value + 1); runtime.say(`${item.name}. ${vehicleSound(item.id)}`); };
+  const choose = (item: LearningItem) => { setSelected(item); setMoving((value) => value + 1); runtime.say(item.name); };
   return (
     <ActivityShell title="Things That Go" subtitle="Roll, sail, and fly" icon="🚗" onHome={runtime.onHome} actions={<ListenButton onClick={() => runtime.say(selected.name)} />}>
       <div className="vehicle-track"><div key={moving} className={`moving-vehicle vehicle-${selected.id}`} aria-hidden="true">{selected.icon}</div><div className="track-line" /></div>
@@ -155,13 +149,11 @@ export function VehiclesActivity({ runtime }: Props) {
   );
 }
 
-function vehicleSound(id: string) { return ({ car: "Vroom vroom!", bus: "Beep beep!", train: "Chug chug!", airplane: "Whoosh!", bicycle: "Ring ring!", motorcycle: "Vroom!", boat: "Splish splash!", truck: "Rumble rumble!", firetruck: "Wee-oo!", ambulance: "Wee-oo!" } as Record<string,string>)[id]; }
 function vehiclePhrase(id: string) { return (["airplane"].includes(id) ? "Up, up in the sky!" : id === "boat" ? "Sailing on the water!" : id === "train" ? "Chugging down the track!" : "Rolling down the road!"); }
 
 export function FeelingsActivity({ runtime }: Props) {
   const [selected, setSelected] = useState(feelings[0]);
-  useEffect(() => { runtime.say("How are you feeling today?"); }, []); // eslint-disable-line react-hooks/exhaustive-deps
-  const choose = (item: LearningItem) => { setSelected(item); runtime.say(`${item.name}. This face feels ${item.name.toLowerCase()}.`); };
+  const choose = (item: LearningItem) => { setSelected(item); runtime.say(item.name); };
   return (
     <ActivityShell title="Friendly Feelings" subtitle="Every feeling is okay" icon="😊" onHome={runtime.onHome} actions={<ListenButton onClick={() => runtime.say(selected.name)} />}>
       <div className="feeling-stage"><span aria-hidden="true">{selected.icon}</span><div><p className="feature-kicker">I FEEL</p><h2>{selected.name}</h2><p>{feelingPhrase(selected.id)}</p></div></div>

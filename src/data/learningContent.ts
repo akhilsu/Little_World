@@ -18,7 +18,7 @@ export const activities: ActivityDefinition[] = [
   { id: "shapes", name: "Shapes", shortName: "Shapes", icon: "🔷", color: "#ffb74d", description: "Round, pointy, and more" },
   { id: "alphabet", name: "ABC Playground", shortName: "ABC", icon: "Aa", color: "#63bddd", description: "Letters and little words" },
   { id: "numbers", name: "Numbers", shortName: "Numbers", icon: "123", color: "#7fc77d", description: "Count happy dots" },
-  { id: "animals", name: "Animal Friends", shortName: "Animals", icon: "🦁", color: "#f4b34e", description: "Meet and hear animals" },
+  { id: "animals", name: "Animal Friends", shortName: "Animals", icon: "🦁", color: "#f4b34e", description: "Meet and name animals" },
   { id: "foods", name: "Fruits & Veggies", shortName: "Yummy Food", icon: "🍎", color: "#ef777b", description: "Colorful food friends" },
   { id: "vehicles", name: "Things That Go", shortName: "Vehicles", icon: "🚗", color: "#73a9eb", description: "Roll, sail, and fly" },
   { id: "matching", name: "Match It", shortName: "Match It", icon: "🧩", color: "#b091df", description: "Find the perfect pair" },
@@ -65,11 +65,11 @@ export const alphabet: LearningItem[] = [
 ].map(([letter, word, icon]) => ({ id: letter.toLowerCase(), name: letter, association: word, icon }));
 
 export const animals: LearningItem[] = [
-  ["cow","Cow","🐄","Farm","Moo"],["dog","Dog","🐶","Farm","Woof"],["cat","Cat","🐱","Farm","Meow"],["sheep","Sheep","🐑","Farm","Baa"],["horse","Horse","🐴","Farm","Neigh"],["duck","Duck","🦆","Farm","Quack"],
-  ["lion","Lion","🦁","Wild","Roar"],["tiger","Tiger","🐯","Wild","Roar"],["elephant","Elephant","🐘","Wild","Trumpet"],["monkey","Monkey","🐵","Wild","Ooh ooh"],["zebra","Zebra","🦓","Wild","Neigh"],["giraffe","Giraffe","🦒","Wild","Hum"],
-  ["parrot","Parrot","🦜","Birds","Squawk"],["owl","Owl","🦉","Birds","Hoot"],["crow","Crow","🐦‍⬛","Birds","Caw"],["peacock","Peacock","🦚","Birds","Call"],
-  ["fish","Fish","🐟","Sea","Blub blub"],["whale","Whale","🐋","Sea","Whoosh"],["dolphin","Dolphin","🐬","Sea","Click click"],["turtle","Turtle","🐢","Sea","Hello"],
-].map(([id,name,icon,group,speech]) => ({ id, name, icon, group, speech }));
+  ["cow","Cow","🐄","Farm"],["dog","Dog","🐶","Farm"],["cat","Cat","🐱","Farm"],["sheep","Sheep","🐑","Farm"],["horse","Horse","🐴","Farm"],["duck","Duck","🦆","Farm"],
+  ["lion","Lion","🦁","Wild"],["tiger","Tiger","🐯","Wild"],["elephant","Elephant","🐘","Wild"],["monkey","Monkey","🐵","Wild"],["zebra","Zebra","🦓","Wild"],["giraffe","Giraffe","🦒","Wild"],
+  ["parrot","Parrot","🦜","Birds"],["owl","Owl","🦉","Birds"],["crow","Crow","🐦‍⬛","Birds"],["peacock","Peacock","🦚","Birds"],
+  ["fish","Fish","🐟","Sea"],["whale","Whale","🐋","Sea"],["dolphin","Dolphin","🐬","Sea"],["turtle","Turtle","🐢","Sea"],
+].map(([id,name,icon,group]) => ({ id, name, icon, group }));
 
 export const foods: LearningItem[] = [
   ["apple","Apple","🍎","Fruits"],["banana","Banana","🍌","Fruits"],["mango","Mango","🥭","Fruits"],["orange","Orange","🍊","Fruits"],["grapes","Grapes","🍇","Fruits"],["watermelon","Watermelon","🍉","Fruits"],["strawberry","Strawberry","🍓","Fruits"],["pineapple","Pineapple","🍍","Fruits"],

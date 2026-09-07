@@ -8,7 +8,7 @@ import { ParentArea, ParentGate } from "./components/ParentArea";
 import type { ActivityId, DailyProgress, Settings } from "./types";
 import { emptyProgress, loadProgress, loadSettings, resetStoredProgress, saveProgress, saveSettings } from "./utils/storage";
 import { sample } from "./utils/random";
-import { happySound, unlockAudio } from "./utils/sound";
+import { clapSound, unlockAudio } from "./utils/sound";
 import { speak, stopSpeaking } from "./utils/speech";
 
 const ActivitiesRouter = lazy(() => import("./activities/ActivitiesRouter"));
@@ -66,10 +66,9 @@ export default function App() {
     const nextPhrase = custom ?? sample(encouragingPhrases);
     setPhrase(nextPhrase);
     setBurst((value) => value + 1);
-    if (settings.soundOn) happySound(settings.volume);
-    say(nextPhrase);
+    if (settings.soundOn) clapSound(settings.volume);
     window.setTimeout(() => setBurst(0), 1800);
-  }, [say, settings.soundOn, settings.volume]);
+  }, [settings.soundOn, settings.volume]);
 
   const trackItem = useCallback((kind: "colors" | "letters" | "animals", id: string) => {
     setProgress((current) => current[kind].includes(id) ? current : { ...current, [kind]: [...current[kind], id] });
@@ -94,7 +93,7 @@ export default function App() {
           <p className="hello">Hello, {settings.childName || "Little Explorer"}! 👋</p>
           <h1 id="welcome-title">Ready to play?</h1>
           <p className="welcome-subtitle">A little world of happy discoveries awaits.</p>
-          <button className="play-button" onClick={() => { unlockAudio(); setStarted(true); say(`Hello ${settings.childName || "little explorer"}! Ready to play?`); }}><span aria-hidden="true">▶</span> Let&apos;s Play</button>
+          <button className="play-button" onClick={() => { unlockAudio(); setStarted(true); }}><span aria-hidden="true">▶</span> Let&apos;s Play</button>
           <div className="welcome-parent"><ParentGate onOpen={() => setParentOpen(true)} /></div>
         </section>
         {parentOpen && <ParentArea settings={settings} progress={progress} onChange={setSettings} onClose={() => setParentOpen(false)} onReset={() => { resetStoredProgress(); setProgress(emptyProgress()); }} onFullscreen={() => void document.documentElement.requestFullscreen?.()} />}

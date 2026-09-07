@@ -6,7 +6,7 @@ import { ActivityShell, BigPrompt, ListenButton, ModeTabs } from "../components/
 import { alphabet, animals, bodyParts, colors, foods, shapes, vehicles } from "../data/learningContent";
 import type { LearningItem } from "../types";
 import { sample, shuffle } from "../utils/random";
-import { popSound, tone } from "../utils/sound";
+import { tone } from "../utils/sound";
 
 type Props = { runtime: ActivityRuntime };
 
@@ -19,9 +19,9 @@ export function MatchingActivity({ runtime }: Props) {
   const completeMatch = (pieceId: string, targetId: string) => {
     if (pieceId === targetId) {
       const next = matched.includes(pieceId) ? matched : [...matched, pieceId];
-      setMatched(next); setHeld(null); runtime.say(`${pieceId}. Match!`);
-      if (next.length === matchItems.length) runtime.reward("All matched!");
-    } else runtime.say("Try another place!");
+      const name = matchItems.find((item) => item.id === pieceId)?.name ?? pieceId;
+      setMatched(next); setHeld(null); runtime.reward(next.length === matchItems.length ? "All matched!" : `${name}!`);
+    }
   };
   const tryMatch = (id: string) => {
     if (!held) { setHeld(id); return; }
@@ -60,10 +60,10 @@ export function MemoryActivity({ runtime }: Props) {
     setOpen([open[0], card.uid]);
     if (first?.id === card.id) {
       const next = [...found, card.id];
-      window.setTimeout(() => { setFound(next); setOpen([]); if (next.length === runtime.settings.memoryPairs) runtime.reward("You found every pair!"); }, 500);
+      window.setTimeout(() => { setFound(next); setOpen([]); runtime.reward(next.length === runtime.settings.memoryPairs ? "You found every pair!" : `${card.name}!`); }, 500);
     } else {
       setBusy(true);
-      window.setTimeout(() => { setOpen([]); setBusy(false); runtime.say("Where is its friend?"); }, 1200);
+      window.setTimeout(() => { setOpen([]); setBusy(false); }, 1200);
     }
   };
   const reset = () => { setRound((value) => value + 1); setOpen([]); setFound([]); setBusy(false); };
@@ -142,7 +142,7 @@ export function MusicActivity({ runtime }: Props) {
       <ModeTabs value={mode} options={[{ value: "piano", label: "Piano", icon: "🎹" }, { value: "drums", label: "Drums", icon: "🥁" }, { value: "animals", label: "Animal Band", icon: "🐮" }, { value: "xylo", label: "Xylophone", icon: "🎶" }]} onChange={setMode} />
       {mode === "piano" && <div className="piano">{pianoNotes.map((note, index) => <button key={note} style={{ "--key-index": index } as React.CSSProperties} onClick={() => play(note)} aria-label={`Piano key ${index + 1}`}><span>{["Do","Re","Mi","Fa","Sol","La","Ti","Do"][index]}</span></button>)}</div>}
       {mode === "drums" && <div className="drum-kit"><button onClick={() => play(90, "sine", .28)}><span>🥁</span><b>BOOM</b></button><button onClick={() => play(170, "triangle", .18)}><span>🪘</span><b>TAP</b></button><button onClick={() => play(310, "square", .12)}><span>✨</span><b>TING</b></button></div>}
-      {mode === "animals" && <div className="animal-band">{animals.slice(0, 6).map((item, index) => <button key={item.id} onClick={() => { play(pianoNotes[index], "triangle"); runtime.say(`${item.speech}!`); }}><span>{item.icon}</span><b>{item.speech}</b></button>)}</div>}
+      {mode === "animals" && <div className="animal-band">{animals.slice(0, 6).map((item, index) => <button key={item.id} onClick={() => { play(pianoNotes[index], "triangle"); runtime.say(item.name); }}><span>{item.icon}</span><b>{item.name}</b></button>)}</div>}
       {mode === "xylo" && <div className="xylophone">{pianoNotes.map((note, index) => <button key={note} style={{ width: `${100 - index * 5}%`, "--bar-index": index } as React.CSSProperties} onClick={() => play(note * 1.5, "sine", .55)} aria-label={`Xylophone bar ${index + 1}`} />)}</div>}
       <p className="music-note">🔈 Sounds start softly. Volume lives in the Parent Area.</p>
     </ActivityShell>
@@ -157,11 +157,11 @@ export function KeyboardActivity({ runtime }: Props) {
     if (event.metaKey || event.ctrlKey || event.altKey) return;
     if (["Backspace","Delete","Escape","Tab"," "].includes(event.key)) event.preventDefault();
     const pressed = event.key.toUpperCase();
-    if (/^[A-Z]$/.test(pressed) || /^\d$/.test(pressed)) { setKey(pressed); const letter = alphabet.find((entry) => entry.name === pressed); runtime.say(letter ? `${pressed}. ${letter.association}.` : pressed === "0" ? "Zero" : pressed); if (letter) runtime.trackItem("letters", letter.id); if (runtime.settings.soundOn) tone(sample([340, 380, 420, 460, 500]), runtime.settings.volume, .18); }
+    if (/^[A-Z]$/.test(pressed) || /^\d$/.test(pressed)) { setKey(pressed); const letter = alphabet.find((entry) => entry.name === pressed); runtime.say(letter ? pressed : pressed === "0" ? "Zero" : pressed); if (letter) runtime.trackItem("letters", letter.id); }
   }, [runtime]);
   useEffect(() => { window.addEventListener("keydown", handleKey, { passive: false }); return () => window.removeEventListener("keydown", handleKey); }, [handleKey]);
   return (
-    <ActivityShell title="Keyboard Fun" subtitle="Press any letter or number" icon="⌨️" onHome={runtime.onHome} actions={<ListenButton onClick={() => runtime.say(item ? `${key}. ${item.association}.` : key)} />}>
+    <ActivityShell title="Keyboard Fun" subtitle="Press any letter or number" icon="⌨️" onHome={runtime.onHome} actions={<ListenButton onClick={() => runtime.say(key === "0" ? "Zero" : key)} />}>
       <div className="keyboard-stage" key={key}><div className="key-burst">{key}</div>{item && <div className="key-friend"><span>{item.icon}</span><h2>{item.association}</h2><p>{key} is for {item.association}</p></div>}{isNumber && !item && <div className="key-friend"><div className="key-dots">{Array.from({ length: Number(key) }, (_, index) => <span key={index} />)}</div><h2>{key === "0" ? "Zero" : `${key} happy dots`}</h2></div>}</div>
       <div className="keyboard-hint"><span aria-hidden="true">☝️</span><div><b>Try the real keyboard</b><p>Letters and numbers make a surprise appear.</p></div></div>
     </ActivityShell>
@@ -189,7 +189,6 @@ export function BubbleActivity({ runtime }: Props) {
     if (bubble.popped) return;
     setBubbles((current) => current.map((item) => item.id === bubble.id ? { ...item, popped: true } : item));
     setReveal(bubble);
-    if (runtime.settings.soundOn) popSound(runtime.settings.volume);
     runtime.say(bubble.value);
     window.setTimeout(() => { const nextRound = round + 1; setRound(nextRound); setBubbles(makeBubbles(mode, nextRound)); }, 900);
     window.setTimeout(() => setReveal((current) => current?.id === bubble.id ? null : current), 1300);
@@ -217,7 +216,7 @@ export function FindActivity({ runtime }: Props) {
   useEffect(() => { runtime.say(current.prompt); }, [challenge]); // eslint-disable-line react-hooks/exhaustive-deps
   const choose = (item: LearningItem) => {
     if (item.id === current.target.id) { runtime.reward("You found it!"); window.setTimeout(() => setChallenge((value) => (value + 1) % findChallenges.length), 800); }
-    else { setWiggle(item.id); runtime.say("Try another one!"); window.setTimeout(() => setWiggle(null), 450); }
+    else { setWiggle(item.id); window.setTimeout(() => setWiggle(null), 450); }
   };
   return (
     <ActivityShell title="Find It" subtitle="Look closely and tap the answer" icon="🔎" onHome={runtime.onHome} actions={<ListenButton onClick={() => runtime.say(current.prompt)} />}>
@@ -236,7 +235,6 @@ export function BodyActivity({ runtime }: Props) {
     const item = bodyParts.find((part) => part.id === id)!; setSelected(item);
     if (mode === "explore") runtime.say(item.name);
     else if (id === target.id) { runtime.reward(`Yes! ${item.name}!`); setTarget(sample(bodyParts.filter((part) => part.id !== target.id))); }
-    else runtime.say("Try another body part!");
   };
   return (
     <ActivityShell title="My Body" subtitle="Tap the friendly picture" icon="🙋" onHome={runtime.onHome} actions={<ListenButton onClick={() => runtime.say(mode === "find" ? `Where are the ${target.name}?` : selected.name)} />}>
@@ -265,10 +263,10 @@ export function SurpriseActivity({ runtime }: Props) {
   useEffect(() => { runtime.say(current.prompt); }, [current.prompt]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (current.kind !== "key") return;
-    const listener = (event: KeyboardEvent) => { if (event.key.toUpperCase() === current.target) { runtime.reward("That is B!"); window.setTimeout(next, 900); } else if (/^[a-z]$/i.test(event.key)) runtime.say("Try the letter B!"); };
+    const listener = (event: KeyboardEvent) => { if (event.key.toUpperCase() === current.target) { runtime.reward("That is B!"); window.setTimeout(next, 900); } };
     window.addEventListener("keydown", listener); return () => window.removeEventListener("keydown", listener);
   }, [current, next, runtime]);
-  const tap = (item: LearningItem) => { if (item.id === current.target) { runtime.reward("Surprise! You found it!"); window.setTimeout(next, 900); } else runtime.say("Try another one!"); };
+  const tap = (item: LearningItem) => { if (item.id === current.target) { runtime.reward("Surprise! You found it!"); window.setTimeout(next, 900); } };
   return (
     <ActivityShell title="Surprise Me!" subtitle="A new tiny adventure every time" icon="🎁" onHome={runtime.onHome} actions={<button className="activity-tool-button" onClick={next}>🎲 Another</button>}>
       <div className="surprise-box"><div className="box-lid" aria-hidden="true">🎁</div><BigPrompt>{current.prompt}</BigPrompt>{current.kind === "key" ? <div className="press-key-stage"><span>B</span><p>Find B on the keyboard</p></div> : <div className="surprise-options">{current.options?.map((item) => { const isColor = colors.some((color) => color.id === item.id); return <button key={item.id} onClick={() => tap(item)} style={item.color ? { "--surprise-color": item.color } as React.CSSProperties : undefined}><span className={isColor ? "surprise-color-dot" : ""} aria-hidden="true">{isColor ? "" : item.icon}</span><b>{item.name}</b></button>; })}</div>}</div>
